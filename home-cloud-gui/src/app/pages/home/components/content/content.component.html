@@ -1,0 +1,92 @@
+<div class="container">
+  <br>
+
+  <h3>Path: {{currentPath}}</h3>
+  <hr>
+
+  <div class="row">
+    <div class="col-10">
+      <div class="input-group">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" (change)="handleFileInput($event.target.files)"
+            id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">
+          <label class="custom-file-label" for="inputGroupFile04">{{getFileName()}}</label>
+        </div>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="uploadFile()"
+            id="inputGroupFileAddon04">Upload</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-block btn-outline-primary" data-toggle="modal"
+        data-target="#newFolderModal">Create Folder</button>
+    </div>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Last Modified</th>
+        <th>Size</th>
+        <th>...</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr (click)="goBack()">
+        <td><img src="/assets/img/back.png" alt="" /> ../</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr *ngFor="let directory of content.directories" (click)="changeDir(directory.name)">
+        <td><img src="/assets/img/folder.png" alt="folder" /> {{directory.name}}</td>
+        <td>{{directory.lastModified}}</td>
+        <td>-</td>
+        <td><button (click)="deleteFolder(directory.name)" type="button" class="btn btn-outline-danger">X</button></td>
+      </tr>
+      <tr *ngFor="let file  of content.files">
+        <td><img [src]="getImageByExt(file.extension)" alt="folder" /> {{file.name}}</td>
+        <td>{{file.lastModified}}</td>
+        <td>{{file.size}}</td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" (click)="deleteFile(file.name)" class="btn btn-outline-danger">
+              <i class="fa fa-close"></i>
+            </button>
+            <button class="btn btn-outline-warning">
+              <i class="fa fa-download"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="newFolderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create folder</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Folder name</label>
+          <input [(ngModel)]="newFolderName" type="text" class="form-control" id="exampleInputEmail1"
+            aria-describedby="emailHelp">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="createFolder()" data-dismiss="modal">Create</button>
+      </div>
+    </div>
+  </div>
+</div>

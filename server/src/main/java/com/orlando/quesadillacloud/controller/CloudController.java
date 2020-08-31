@@ -1,21 +1,14 @@
 package com.orlando.quesadillacloud.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-
-import javax.servlet.ServletContext;
 
 import com.orlando.quesadillacloud.dto.Content;
 import com.orlando.quesadillacloud.service.StorageService;
 import com.orlando.quesadillacloud.util.FS;
-import com.orlando.quesadillacloud.util.MediaTypeUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +24,6 @@ public class CloudController {
 
     @Autowired
     private StorageService storageService;
-
-    @Autowired
-    private ServletContext servletContext;
 
     @GetMapping("/ls")
     @CrossOrigin
@@ -55,28 +45,21 @@ public class CloudController {
 
     @GetMapping("/rmFile")
     @CrossOrigin
-    public ResponseEntity<String> removeFile(@RequestParam(defaultValue = "/") String path) {
-        return new ResponseEntity<>(FS.rmFile(path), HttpStatus.OK);
+    public String removeFile(@RequestParam(defaultValue = "/") String path) {
+        return FS.rmFile(path);
     }
 
-    @PostMapping("/upload") // //new annotation since 4.3
+    @CrossOrigin
+    @PostMapping("/upload") 
     public ResponseEntity<String> singleFileUpload(@RequestParam("file") MultipartFile file,
             @RequestParam(defaultValue = "/") String folder) {
         return new ResponseEntity<>(storageService.upload(file, folder), HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping("/download")
-    public ResponseEntity<InputStreamResource> downloadFile(@RequestParam String fileName, @RequestParam(defaultValue = "/") String folder) throws IOException {
-
-    MediaType mediaType = MediaTypeUtils.getMediaTypeForFileName(this.servletContext, fileName);
-
-    File file = new File(FS.homeDirectory + folder + "/" + fileName);
-    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-    return ResponseEntity.ok()
-    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-    .contentType(mediaType)
-    .contentLength(file.length())
-    .body(resource);
+    public ResponseEntity<InputStreamResource> downloadFile(@RequestParam String fileName,
+            @RequestParam(defaultValue = "/") String folder) throws IOException {
+        return storageService.downloadFile(fileName, folder);
     }
-
 }
